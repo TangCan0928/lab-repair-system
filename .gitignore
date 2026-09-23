@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Streamlit
+.streamlit/
+
+# SQLite（保留结构与示例数据，按需提交；这里默认保留，方便他人直接跑）
+# data/*.db
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# 临时
+*.log
+*.tmp
