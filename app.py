@@ -178,8 +178,9 @@ def page_submit():
 
 
 def page_manage():
-    """页面 2：工单管理（列表 + 筛选 + 详情处理）。"""
+    """页面 2：工单管理（列表 + 点击行选中查看详情 + 处理）。"""
     st.header("🗂️ 工单管理")
+    st.caption("💡 在下方表格中**点击任意一行**，即可选中并查看该工单的详细内容。")
 
     # 筛选区
     f1, f2, f3 = st.columns(3)
@@ -197,25 +198,41 @@ def page_manage():
         st.info("暂无符合条件的工单。")
         return
 
-    # 列表用 DataFrame 风格展示
+    # 列表用 DataFrame 展示（点击行可选中）
     show_cols = ["ticket_no", "reporter", "device_name", "location",
                  "category", "urgency", "status", "created_at"]
     import pandas as pd
     df = pd.DataFrame(rows)[show_cols]
     df.columns = ["工单号", "报修人", "设备", "位置", "类别", "紧急", "状态", "提交时间"]
-    st.dataframe(df, use_container_width=True, hide_index=True)
 
-    # 选择某条工单查看详情
-    st.divider()
-    options = {f"{r['ticket_no']} | {r['device_name']} | {r['status']}": r["id"] for r in rows}
-    selected_label = st.selectbox("选择一条工单查看详情 / 处理", list(options.keys()))
-    wo = db.get_workorder(options[selected_label])
-    if not wo:
-        st.warning("未找到该工单。")
+    # 筛选条件变化时自动重置选中状态（key 随条件变化）
+    table_key = f"wo_table_{f_category}_{f_status}_{f_keyword.strip() or '_'}"
+    event = st.dataframe(
+        df,
+        use_container_width=True,
+        hide_index=True,
+        height=320,
+        on_select="rerun",
+        selection_mode="single-row",
+        key=table_key,
+    )
+
+    # 读取用户点击选中的行（位置索引 → 工单 id）
+    selected_wo = None
+    if event and event.selection.rows:
+        pos = event.selection.rows[0]
+        if 0 <= pos < len(rows):
+            selected_wo = db.get_workorder(rows[pos]["id"])
+
+    if selected_wo is None:
+        st.info("👆 请在上方表格中点击一条工单，下方会显示它的详细内容。")
         return
 
-    # 详情展示
-    st.subheader(f"工单详情 — {wo['ticket_no']}")
+    wo = selected_wo
+
+    # 详情展示（卡片式）
+    st.divider()
+    st.subheader(f"📋 工单详情 — {wo['ticket_no']}")
     c1, c2, c3 = st.columns(3)
     c1.markdown(f"**报修人：** {wo['reporter']}")
     c1.markdown(f"**联系方式：** {wo['contact']}")
