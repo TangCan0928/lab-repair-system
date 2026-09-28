@@ -36,8 +36,13 @@ lab_repair_system/
 ├── test_cases/
 │   ├── seed_test_data.py   # 一键灌入 12 条模拟测试工单
 │   └── test_workorders.md  # 12 条测试工单与测试结果
-└── docs/
-    └── test_report.md    # 测试报告（含 2 个真实失败案例与修复过程）
+├── docs/
+│   ├── test_report.md       # 测试报告（含 2 个真实失败案例与修复过程）
+│   ├── ai_usage_record.md   # AI 使用记录
+│   ├── code_review.md       # 代码审阅记录
+│   ├── contribution.md      # 个人贡献说明
+│   └── version_changes.md   # 第一版与最终版变化说明
+└── lab_repair_system_v1.0_final.zip   # 最终代码压缩包（提交材料）
 ```
 
 ## 三、环境准备与启动
@@ -54,6 +59,7 @@ pip install -r requirements.txt
 ### 2. 启动系统
 
 ```bash
+cd lab_repair_system
 streamlit run app.py
 ```
 
@@ -63,15 +69,17 @@ streamlit run app.py
 
 1. 用 PyCharm 打开 `lab_repair_system` 文件夹；
 2. 右下角选择已安装依赖的 Python 解释器；
-3. 打开终端，执行 `streamlit run app.py`；
+3. 打开终端，先执行 `cd lab_repair_system`，再执行 `streamlit run app.py`；
 4. 或新建 Run Configuration：Script 填 `app.py`，Parameters 留空，Working directory 填项目根目录。
 
 ## 四、内置账号 / 角色说明
 
-本系统按任务书要求**不做注册登录与复杂权限**，分两个使用视角：
+本系统按任务书要求**不做注册登录与复杂权限**，**无需任何账号**，启动即用，分两个使用视角：
 
-- **普通使用者**：在「📝 提交报修」页提交工单；
+- **普通使用者**：在「📝 提交报修」页提交工单（不需要登录，直接填表）；
 - **管理员/维修人员**：在「🗂️ 工单管理」页查看、筛选、处理工单，在「📊 统计看板」查看概览。
+
+> 示例工单：可直接用数据库预置的 12 条测试工单演示，或提交新的报修（如报修人"张三"、设备"显示器"、位置"实验室302"、描述"屏幕不亮"）。
 
 ## 五、AI 分析说明
 
@@ -99,3 +107,18 @@ python test_cases/seed_test_data.py
 - 提交信息使用 `feat: / fix: / docs: / test:` 前缀；
 - 每人至少 5 次有效提交，分布在至少 2 个时间段；
 - 合并前在 Issues 中记录负责人与目标。
+
+## 八、最终提交材料清单（自检）
+
+| # | 材料 | 位置 |
+|---|------|------|
+| 1 | Git 仓库地址及最终代码压缩包 | `https://github.com/TangCan0928/lab-repair-system` + `lab_repair_system_v1.0_final.zip` |
+| 2 | README 运行说明、依赖清单、启动方式 | 本文件 + `requirements.txt` |
+| 3 | 数据库文件/建表脚本 | `data/repair.db` + `database.py` |
+| 4 | 故障知识库（10 条，≥8） | `knowledge_base.py` |
+| 5 | 12 条测试工单及结果 | `test_cases/` |
+| 6 | 2 个失败案例及修改过程 | `docs/test_report.md` |
+| 7 | AI 使用记录 | `docs/ai_usage_record.md` |
+| 8 | Git 提交记录、代码审阅、个人贡献 | Git 仓库 + `docs/code_review.md` + `docs/contribution.md` |
+| 9 | 3-5 分钟演示视频 | 待录制（脚本见考核说明） |
+| 10 | 第一版与最终版变化说明 | `docs/version_changes.md` |
