@@ -27,6 +27,77 @@ STATUS_COLOR = {
 }
 URGENCY_COLOR = {"高": "#ff4b4b", "中": "#ffa500", "低": "#2ecc71"}
 
+# 侧边栏 / 导航栏美化样式（深蓝科技风）
+NAV_CSS = """
+<style>
+/* 侧边栏背景：深蓝渐变 */
+section[data-testid="stSidebar"] {
+    background: linear-gradient(180deg, #0b2239 0%, #123b5e 55%, #155e75 100%);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* 侧边栏文字颜色 */
+section[data-testid="stSidebar"] p,
+section[data-testid="stSidebar"] span,
+section[data-testid="stSidebar"] label,
+section[data-testid="stSidebar"] h1,
+section[data-testid="stSidebar"] h2,
+section[data-testid="stSidebar"] h3,
+section[data-testid="stSidebar"] h4,
+section[data-testid="stSidebar"] .caption {
+    color: #d7e7f3;
+}
+
+/* 导航链接基础样式 */
+section[data-testid="stSidebar"] [data-testid="stSidebarNav"] a,
+section[data-testid="stSidebar"] a[data-testid="stPageLink"] {
+    color: #cfe3f0;
+    border-radius: 8px;
+    padding: 0.45rem 0.65rem;
+    margin-bottom: 2px;
+    transition: all 0.2s ease;
+}
+
+/* 悬停效果 */
+section[data-testid="stSidebar"] [data-testid="stSidebarNav"] a:hover,
+section[data-testid="stSidebar"] a[data-testid="stPageLink"]:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+}
+
+/* 当前页高亮 */
+section[data-testid="stSidebar"] [data-testid="stSidebarNav"] a[aria-current="page"],
+section[data-testid="stSidebar"] a[data-testid="stPageLink"][aria-current="page"] {
+    background: linear-gradient(90deg, #00b4d8, #48cae4);
+    color: #06283d !important;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(0, 180, 216, 0.35);
+}
+
+/* 导航分组标题 */
+section[data-testid="stSidebar"] [data-testid="stSidebarNav"] header,
+section[data-testid="stSidebar"] [data-testid="stSidebarNav"] div[role="heading"] {
+    color: #8fb7cd;
+    letter-spacing: 1px;
+    font-size: 0.8rem;
+}
+
+/* 滚动条配色 */
+section[data-testid="stSidebar"] ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+section[data-testid="stSidebar"] ::-webkit-scrollbar {
+    width: 6px;
+}
+</style>
+"""
+
+
+def inject_nav_css():
+    """注入导航栏美化样式（需在 st.navigation 之后调用）。"""
+    st.markdown(NAV_CSS, unsafe_allow_html=True)
+
 
 def page_submit():
     """页面 1：提交报修。"""
@@ -239,25 +310,43 @@ def page_kb():
 
 
 def main():
+    # 现代分组导航（官方组件，自动带图标、当前页高亮）
+    pages = st.navigation(
+        {
+            "📋 工单业务": [
+                st.Page(page_submit, title="提交报修", icon="📝", default=True),
+                st.Page(page_manage, title="工单管理", icon="🗂️"),
+            ],
+            "📊 数据与知识": [
+                st.Page(page_stats, title="统计看板", icon="📊"),
+                st.Page(page_kb, title="故障知识库", icon="📚"),
+            ],
+        }
+    )
+
+    # 美化样式（必须在 st.navigation 之后注入）
+    inject_nav_css()
+
+    # 全局页头（所有页面统一显示）
     st.title("🔧 实验室设备报修与 AI 智能工单系统")
     st.caption("本地运行 · SQLite 持久化 · AI 规则分析 + 知识库匹配")
 
+    # 侧边栏底部：小组信息卡片
     with st.sidebar:
-        st.header("导航")
-        page = st.radio(
-            "选择功能页",
-            ["📝 提交报修", "🗂️ 工单管理", "📊 统计看板", "📚 知识库"],
-            index=0,
+        st.markdown("---")
+        st.markdown(
+            '<div style="padding:0.7rem 0.8rem;background:rgba(255,255,255,0.08);'
+            'border-radius:10px;border:1px solid rgba(255,255,255,0.16);">'
+            '<div style="font-weight:700;color:#ffffff;font-size:0.9rem;">👥 小组信息</div>'
+            '<div style="color:#cde1ef;font-size:0.8rem;margin-top:5px;">'
+            '唐灿（组长）· 谢曼婕</div>'
+            '<div style="color:#8fb7cd;font-size:0.75rem;margin-top:4px;">'
+            'v1.0 · Streamlit + SQLite · 本地运行</div>'
+            "</div>",
+            unsafe_allow_html=True,
         )
 
-    if page.startswith("📝"):
-        page_submit()
-    elif page.startswith("🗂️"):
-        page_manage()
-    elif page.startswith("📊"):
-        page_stats()
-    else:
-        page_kb()
+    pages.run()
 
 
 if __name__ == "__main__":
